@@ -109,20 +109,23 @@ struct Project {};
 };
 ignore Project;
 
+%typemap(out) int {
+    $result = Py_BuildValue("(i)", $1);
+}
+
+
 /* INSERTS CUSTOM EXCEPTION HANDLING IN WRAPPER */
 %exception
 {
     $action
-    if ( result > 10) {
-        char errmsg[EN_MAXMSG];
-        EN_geterror(result, errmsg, EN_MAXMSG);
-        PyErr_SetString(PyExc_Exception, errmsg);
+    if ( result > 0) {
+        PyErr_SetString(PyExc_Exception, "ERROR");
         SWIG_fail;
-    }
-    else if (result > 0) {
-        PyErr_WarnEx(PyExc_Warning, "WARNING", 2);
+    } else {
+        $result = Py_BuildValue("(i)", result);
     }
 }
+
 
 %feature("autodoc", "2");
 %newobject EN_createproject;
